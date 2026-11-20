@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'">
+<title>Macbee Owned Audio Fixture</title>
+<style>body{font:17px system-ui;max-width:760px;margin:45px auto;color:#24262b;background:#fafafa}button{font:inherit;padding:12px 18px;margin:8px 10px 8px 0}p{line-height:1.5}pre{padding:16px;background:#eee;border-radius:12px;white-space:pre-wrap;font-size:12px}</style>
+<h1>Macbee Owned Audio Fixture</h1>
+<p>Owned synthetic audio only. No microphone, network requests, recording, account or personal media.</p>
+<p>Offline qualification never opens a speaker. Prepare opens a sub-quantization keepalive. Play schedules six quiet 100 ms tones after 4 seconds, 0.5 seconds apart, once only. The output closes after 5 minutes.</p>
+<button id="prepare" disabled>Prepare silent source</button><button id="play" disabled>Play six quiet tones</button><button id="stop" disabled>Close test output</button>
+<p id="state" role="status" aria-live="polite">Qualifying the owned pattern in memory. No speaker is open.</p><pre id="events" aria-label="Monotonic test events"></pre>
+<script>
+'use strict';
+const rate=48000,delay=4,spacing=.5,duration=.1,count=6,peak=.005;
+const state=document.getElementById('state'),log=document.getElementById('events');
+const prepare=document.getElementById('prepare'),play=document.getElementById('play'),stop=document.getElementById('stop');
+let context=null,zero=null,closed=false,qualified=false;
+function stamp(event,extra={}){const perf=performance.now();log.textContent+=JSON.stringify({event,perf_ms:perf,epoch_ms:performance.timeOrigin+perf,context_s:context?context.currentTime:null,...extra})+'\n';}
+function markers(ctx,start,ended){for(let i=0;i<count;i++){const tone=ctx.createOscillator(),gain=ctx.createGain();tone.frequency.value=880;gain.gain.value=0;tone.connect(gain);gain.connect(ctx.destination);const curve=new Float32Array(241);for(let j=0;j<curve.length;j++)curve[j]=peak*Math.sin(Math.PI*j/(curve.length-1))**2;gain.gain.setValueCurveAtTime(curve,start+i*spacing,duration);tone.start(start+i*spacing);tone.stop(start+i*spacing+duration);if(ended)tone.onended=()=>ended(i);}}
+async function close(){if(closed)return;closed=true;if(context)await context.close();play.disabled=true;stop.disabled=true;state.textContent='Test output closed.';stamp('output_closed');}
+async function qualify(){const off=new OfflineAudioContext(2,Math.ceil((count*spacing+.2)*rate),rate);markers(off,.1);let buffer=await off.startRendering(),channel=buffer.getChannelData(0),max=0,nonzero=0;for(let i=0;i<channel.length;i++){max=Math.max(max,Math.abs(channel[i]));if(Math.abs(channel[i]*32768)>.5)nonzero++;}qualified=max>.004 && max<=.00501 && nonzero>20000 && nonzero<30000;stamp('offline_qualified',{qualified,peak_float:max,nonzero_pcm_frames:nonzero,sample_rate:rate});buffer=null;channel=null;state.textContent=qualified?'Pattern qualified in memory. No speaker is open.':'Offline qualification failed. Playback disabled.';prepare.disabled=!qualified;}
+prepare.onclick=async()=>{prepare.disabled=true;try{if(!qualified)throw Error('Pattern did not qualify');context=new AudioContext({sampleRate:rate});zero=context.createConstantSource();zero.offset.value=.000001;zero.connect(context.destination);zero.start();await context.resume();if(context.sampleRate!==rate)throw Error('Expected 48000 Hz');play.disabled=false;stop.disabled=false;state.textContent='Test source ready. Keepalive is below 16-bit quantization. Markers have not started.';stamp('source_prepared');setTimeout(close,300000);}catch(error){state.textContent='Preparation failed: '+error.message;if(context)await context.close();}};
+play.onclick=()=>{play.disabled=true;if(!context||context.state!=='running'||closed){state.textContent='Output is not running. No tones started.';stamp('play_rejected');return;}const start=context.currentTime+delay,mapping=context.getOutputTimestamp();stamp('play_clicked',{context_state:context.state,start_context_s:start,end_context_s:start+(count-1)*spacing+duration,estimated_start_perf_ms:mapping.performanceTime+(start-mapping.contextTime)*1000,output_mapping:mapping});markers(context,start,i=>{stamp('marker_ended',{marker:i+1});if(i===count-1)state.textContent='Six owned markers finished. No repeat is scheduled.';});state.textContent='Six quiet markers scheduled once after 4 seconds. Peak 0.005 (-46 dBFS).';};
+stop.onclick=close;window.addEventListener('pagehide',()=>{if(context)context.close();});qualify().catch(error=>{state.textContent='Offline qualification failed: '+error.message;});
+</script></html>

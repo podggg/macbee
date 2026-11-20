@@ -1,0 +1,6 @@
+{
+  "backend_root": "/path/to/scoped-backend-build",
+  "probe_path": "/path/to/compiled/macbee-tone-probe",
+  "ssh_host": "your-existing-verified-alias",
+  "remote_root": "/absolute/path/to/receiver-test-runtime"
+}

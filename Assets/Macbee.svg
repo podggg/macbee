@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Macbee: a small hand-drawn bee sharing sound</title>
+  <defs>
+    <linearGradient id="paper" x2="0" y2="1"><stop stop-color="#fff9e9"/><stop offset="1" stop-color="#f5e8cb"/></linearGradient>
+    <clipPath id="body"><path d="M337 465 C349 366 454 333 555 368 C659 398 729 485 702 578 C675 678 554 697 454 655 C363 618 323 552 337 465Z"/></clipPath>
+  </defs>
+  <rect x="55" y="55" width="914" height="914" rx="211" fill="url(#paper)"/>
+  <path d="M153 733 C166 759 177 771 202 783 M830 217 L850 244" fill="none" stroke="#e5d4ac" stroke-width="11" stroke-linecap="round"/>
+  <g fill="#fdfdf7" stroke="#33362e" stroke-width="20" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M442 406 C343 348 306 263 360 230 C428 192 485 280 504 374 C514 275 571 233 613 273 C657 316 589 391 541 421Z"/>
+    <path d="M337 465 C349 366 454 333 555 368 C659 398 729 485 702 578 C675 678 554 697 454 655 C363 618 323 552 337 465Z" fill="#f6c453"/>
+    <g clip-path="url(#body)" stroke="#35372e" stroke-width="56">
+      <path d="M471 367 C424 462 430 569 475 655"/>
+      <path d="M572 393 C527 486 538 594 581 674"/>
+    </g>
+    <path d="M343 557 L297 582 L333 604" fill="#33362e" stroke-width="15"/>
+    <path d="M627 393 C635 346 670 330 689 342 M670 422 C703 394 732 400 739 421" fill="none" stroke-width="15"/>
+    <path d="M656 483 L657 489 M614 464 L614 470" stroke-width="19"/>
+    <path d="M624 518 Q644 544 669 525" fill="none" stroke-width="13"/>
+    <path d="M451 671 L431 714 M551 694 L554 729" fill="none" stroke-width="16"/>
+  </g>
+  <g fill="none" stroke="#668c9e" stroke-width="22" stroke-linecap="round">
+    <path d="M258 447 Q224 496 249 547"/>
+    <path d="M204 407 Q148 490 189 580"/>
+    <path d="M776 467 Q809 511 783 558"/>
+    <path d="M833 429 Q885 510 841 596"/>
+  </g>
+  <path d="M386 787 Q502 806 629 784" fill="none" stroke="#d3ba86" stroke-width="12" stroke-linecap="round"/>
+</svg>
